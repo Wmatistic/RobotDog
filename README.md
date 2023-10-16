@@ -6,5 +6,4 @@
 
 * Add walking functionality (via setAngle() method with arrays?)
 
-* Design main chassis
-
+* ~~Design main chassis~~
