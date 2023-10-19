@@ -13,8 +13,8 @@ Copy Paste Movement Input
 */
 
 //      LEGS
-const double thighLength = 15;
-const double calfLength = 15;
+const double thighLength = 6.5;
+const double calfLength = 6.5;
 double angles[4][3];
 
 //  Front Left LEG
@@ -51,16 +51,16 @@ void loop() {
   joystickX = analogRead(XPin);
   joystickY = analogRead(YPin);
 
-  moveOrrin(0, 20,0,
-            0, 0, 0,
+  moveOrrin(0, 13, 0,
+            0, 13, 150,
             0, 0, 0,
             0, 0, 0);
 
   Serial.print("thigh: ");
-  Serial.println(angles[0][0]);
+  Serial.println(angles[1][0]);
   Serial.print("calf: ");
-  Serial.println(angles[0][1]);
-  //Serial.println(angles[0][2]);
+  Serial.println(angles[1][1]);
+  //Serial.println(angles[1][2]);
 }
 
 void moveOrrin(double x0, double y0, double r0,
@@ -74,14 +74,23 @@ void moveOrrin(double x0, double y0, double r0,
                       {x3, y3, r3}};
   
   calculateLegAngles(pos);
+  delay(100);
 
   //  Front Left LEG
   // THIGH
-  HCPCA9685.Servo(FLThigh, angles[0][0]);
+//  HCPCA9685.Servo(FLThigh, angles[0][0]);
+//  // CALF
+//  HCPCA9685.Servo(FLCalf, angles[0][1]);
+//  // HIP
+//  HCPCA9685.Servo(FLHip, angles[0][2]);
+
+  //  Front Right LEG
+  // THIGH
+  HCPCA9685.Servo(FRThigh, angles[1][0]);
   // CALF
-  HCPCA9685.Servo(FLCalf, angles[0][1]);
+  HCPCA9685.Servo(FRCalf, angles[1][1]);
   // HIP
-  HCPCA9685.Servo(FLHip, angles[0][2]);
+  HCPCA9685.Servo(FRHip, angles[1][2]);
 }
 
 void calculateLegAngles(double pos[4][3]) {
@@ -102,16 +111,32 @@ void calculateLegAngles(double pos[4][3]) {
         - atan((calfLength * sin(q2))
         / (thighLength + calfLength * cos(q2)));
 
-     angles[i][0] = convertThighAngleToServo(q1);
-     angles[i][1] = convertCalfAngleToServo(q2);
+     if (i % 2 == 0 || i == 0) {
+      angles[i][0] = altConvertThighAngleToServo(q1);
+     } else {
+      angles[i][0] = convertThighAngleToServo(q1);
+     }
+     if (i % 2 == 0 || i == 0) {
+      angles[i][1] = convertCalfAngleToServo(q2);
+     } else {
+      angles[i][1] = altConvertCalfAngleToServo(q2);
+     }
      angles[i][2] = r;
+     
   }
 }
 
 double convertThighAngleToServo(double angle) {
-  return (127.5 - (angle / (2 * PI)) * 255);
+//  return (180 - (angle / (2 * PI)) * 360);
+  return (((angle * (180 / PI))));
 }
-
+double altConvertThighAngleToServo(double angle) {
+  return ((180-(angle * (180 / PI))));
+}
 double convertCalfAngleToServo(double angle) {
-  return ((angle / (2 * PI)) * 255);
+  return (((angle * (180 / PI))));
+}
+double altConvertCalfAngleToServo(double angle) {
+//  return (127.5 - (angle / (2 * PI)) * 255);
+  return  ((90-(angle * (180 / PI))))*1.2;
 }
