@@ -9,3 +9,5 @@
 * Add walking functionality (via setAngle() method with arrays?)
 
 * ~~Design main chassis~~
+
+* Add offsets for joint angles for real world tuning
