@@ -19,22 +19,30 @@ double angles[4][3];
 
 //  Front Left LEG
 const int FLThigh = 0;
+const double FLThighOffset = 1.0;
 const int FLCalf = 1;
+const double FLCalfOffest = 1.0;
 const int FLHip = 2;
 
 //  Front Right LEG
 const int FRThigh = 3;
+const double FRThighOffset = 1.0;
 const int FRCalf = 4;
+const double FRCalfOffset = 1.2;
 const int FRHip = 5;
 
 //  Back Left LEG
 const int BLThigh = 6;
+const double BLThighOffset = 1.0;
 const int BLCalf = 7;
+const double BLCalfOffset = 1.0;
 const int BLHip = 8;
 
 // Back Right LEG
 const int BRThigh = 9;
+const double BRThighOffset = 1.0;
 const int BRCalf = 10;
+const double BRCalfOffset = 1.0;
 const int BRHip = 11;
 
 //    JOYSTICK
@@ -78,17 +86,17 @@ void moveOrrin(double x0, double y0, double r0,
 
   //  Front Left LEG
   // THIGH
-//  HCPCA9685.Servo(FLThigh, angles[0][0]);
+//  HCPCA9685.Servo(FLThigh, altConvertThighAngleToServo(angles[0][0]));
 //  // CALF
-//  HCPCA9685.Servo(FLCalf, angles[0][1]);
+//  HCPCA9685.Servo(FLCalf, convertCalfAngleToServo(angles[0][1]));
 //  // HIP
 //  HCPCA9685.Servo(FLHip, angles[0][2]);
 
   //  Front Right LEG
   // THIGH
-  HCPCA9685.Servo(FRThigh, angles[1][0]);
+  HCPCA9685.Servo(FRThigh, convertThighAngleToServo(angles[1][0]));
   // CALF
-  HCPCA9685.Servo(FRCalf, angles[1][1]);
+  HCPCA9685.Servo(FRCalf, altConvertCalfAngleToServo(angles[1][1]) * FRCalfOffset);
   // HIP
   HCPCA9685.Servo(FRHip, angles[1][2]);
 }
@@ -111,32 +119,24 @@ void calculateLegAngles(double pos[4][3]) {
         - atan((calfLength * sin(q2))
         / (thighLength + calfLength * cos(q2)));
 
-     if (i % 2 == 0 || i == 0) {
-      angles[i][0] = altConvertThighAngleToServo(q1);
-     } else {
-      angles[i][0] = convertThighAngleToServo(q1);
-     }
-     if (i % 2 == 0 || i == 0) {
-      angles[i][1] = convertCalfAngleToServo(q2);
-     } else {
-      angles[i][1] = altConvertCalfAngleToServo(q2);
-     }
+     angles[i][0] = q1;
+     angles[i][1] = q2;
      angles[i][2] = r;
-     
   }
 }
 
 double convertThighAngleToServo(double angle) {
-//  return (180 - (angle / (2 * PI)) * 360);
-  return (((angle * (180 / PI))));
+  return (angle * (180 / PI));
 }
+
 double altConvertThighAngleToServo(double angle) {
-  return ((180-(angle * (180 / PI))));
+  return (180-(angle * (180 / PI)));
 }
+
 double convertCalfAngleToServo(double angle) {
-  return (((angle * (180 / PI))));
+  return (angle * (180 / PI));
 }
+
 double altConvertCalfAngleToServo(double angle) {
-//  return (127.5 - (angle / (2 * PI)) * 255);
-  return  ((90-(angle * (180 / PI))))*1.2;
+  return  (90-(angle * (180 / PI)));
 }
