@@ -10,4 +10,4 @@
 
 * ~~Design main chassis~~
 
-* Add offsets for joint angles for real world tuning
+* ~~Add offsets for joint angles for real world tuning~~
