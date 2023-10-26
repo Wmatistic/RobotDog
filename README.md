@@ -11,3 +11,5 @@
 * ~~Design main chassis~~
 
 * ~~Add offsets for joint angles for real world tuning~~
+
+* Change structure(?) of code to allow for independent leg movement
