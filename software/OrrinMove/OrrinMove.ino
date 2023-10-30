@@ -15,6 +15,7 @@ Copy Paste Movement Input
 //      LEGS
 const double thighLength = 6.5;
 const double calfLength = 6.5;
+const double maxY = calfLength + thighLength;
 double angles[4][3];
 
 //  Front Left LEG
@@ -33,9 +34,9 @@ const int FRHip = 5;
 
 //  Back Left LEG
 const int BLThigh = 6;
-const double BLThighOffset = 1.0;
+const double BLThighOffset = 1.2;
 const int BLCalf = 7;
-const double BLCalfOffset = 1.0;
+const double BLCalfOffset = 1.;
 const int BLHip = 8;
 
 // Back Right LEG
@@ -46,9 +47,11 @@ const double BRCalfOffset = 1.0;
 const int BRHip = 11;
 
 //    JOYSTICK
-const int XPin = A1;
-const int YPin = A0;
+const int XPin = A0;
+const int YPin = A1;
 double joystickX, joystickY;
+double x, y = 2;
+double tempR = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -59,15 +62,27 @@ void loop() {
   joystickX = analogRead(XPin);
   joystickY = analogRead(YPin);
 
-  moveOrrin(0, 13, 0,
-            0, 13, 150,
-            0, 0, 0,
+  if (joystickY > 600 && y > 0) {
+    y -= 0.3;
+  } else if (joystickY == 0 && y < maxY) {
+    y += 0.3;
+  }
+  if (joystickX > 600) {
+    tempR -= 3;
+  } else if (joystickX == 0) {
+    tempR += 3;
+  }
+
+  moveOrrin(0, y, tempR,
+            0, y, 150+tempR,
+            0, y, tempR,
             0, 0, 0);
 
   Serial.print("thigh: ");
-  Serial.println(angles[1][0]);
+  Serial.println(angles[2][0]);
   Serial.print("calf: ");
-  Serial.println(angles[1][1]);
+  Serial.println(angles[2][1]);
+  Serial.println(tempR);
   //Serial.println(angles[1][2]);
 }
 
@@ -86,24 +101,42 @@ void moveOrrin(double x0, double y0, double r0,
 
   //  Front Left LEG
   // THIGH
-//  HCPCA9685.Servo(FLThigh, altConvertThighAngleToServo(angles[0][0]));
-//  // CALF
-//  HCPCA9685.Servo(FLCalf, convertCalfAngleToServo(angles[0][1]));
-//  // HIP
-//  HCPCA9685.Servo(FLHip, angles[0][2]);
+  HCPCA9685.Servo(FLThigh, altConvertThighAngleToServo(angles[0][0]));
+  // CALF
+  HCPCA9685.Servo(FLCalf, convertCalfAngleToServo(angles[0][1]));
+  // HIP
+  HCPCA9685.Servo(FLHip, angles[0][2]);
 
   //  Front Right LEG
   // THIGH
   HCPCA9685.Servo(FRThigh, convertThighAngleToServo(angles[1][0]));
   // CALF
-  HCPCA9685.Servo(FRCalf, altConvertCalfAngleToServo(angles[1][1]) * FRCalfOffset);
+  HCPCA9685.Servo(FRCalf, altConvertCalfAngleToServo(angles[1][1]));
   // HIP
   HCPCA9685.Servo(FRHip, angles[1][2]);
+
+  //  Back Left LEG
+  // THIGH
+  HCPCA9685.Servo(BLThigh, convertThighAngleToServo(angles[2][0]) * BLThighOffset);
+  // CALF
+  HCPCA9685.Servo(BLCalf, altConvertCalfAngleToServo(angles[2][1]) * BLCalfOffset);
+  // HIP
+  HCPCA9685.Servo(BLHip, angles[2][2]);
+
+//  //  Back Right LEG
+//  // THIGH
+//  HCPCA9685.Servo(BRThigh, convertThighAngleToServo(angles[3][0]));
+//  // CALF
+//  HCPCA9685.Servo(BRCalf, convertCalfAngleToServo(angles[3][1]));
+//  // HIP
+//  HCPCA9685.Servo(BRHip, angles[3][2]);
+
+  
 }
 
 void calculateLegAngles(double pos[4][3]) {
 
-  for (int i = 0; i < sizeof(pos); i++){
+  for (int i = 0; i <= sizeof(pos); i++){
     double x = pos[i][0];
     double y = pos[i][1];
     double r = pos[i][2];
