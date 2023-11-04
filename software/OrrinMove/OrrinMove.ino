@@ -20,9 +20,9 @@ double angles[4][3];
 
 //  Front Left LEG
 const int FLThigh = 0;
-const double FLThighOffset = 1.0;
+const double FLThighOffset = 0.9;
 const int FLCalf = 1;
-const double FLCalfOffest = 1.0;
+const double FLCalfOffset = 1.0;
 const int FLHip = 2;
 
 //  Front Right LEG
@@ -50,7 +50,7 @@ const int BRHip = 11;
 const int XPin = A0;
 const int YPin = A1;
 double joystickX, joystickY;
-double x, y = 2;
+double tempX, tempY = 2;
 double tempR = 0;
 
 void setup() {
@@ -62,26 +62,26 @@ void loop() {
   joystickX = analogRead(XPin);
   joystickY = analogRead(YPin);
 
-  if (joystickY > 600 && y > 0) {
-    y -= 0.3;
-  } else if (joystickY == 0 && y < maxY) {
-    y += 0.3;
+  if (joystickY > 600 && tempY > 0) {
+    tempY -= 0.3;
+  } else if (joystickY == 0 && tempY < maxY) {
+    tempY += 0.3;
   }
   if (joystickX > 600) {
-    tempR -= 3;
+    tempX -= 0.3;
   } else if (joystickX == 0) {
-    tempR += 3;
+    tempX += 0.3;
   }
 
-  moveOrrin(0, y, tempR,
-            0, y, 150+tempR,
-            0, y, tempR,
+  moveOrrin(tempX, tempY, tempR,
+            0, tempY, 150+tempR,
+            0, tempY, tempR,
             0, 0, 0);
 
   Serial.print("thigh: ");
-  Serial.println(angles[2][0]);
+  Serial.println(convertThighAngleToServo(angles[1][0]));
   Serial.print("calf: ");
-  Serial.println(angles[2][1]);
+  Serial.println(convertCalfAngleToServo(angles[1][1]));
   Serial.println(tempR);
   //Serial.println(angles[1][2]);
 }
@@ -101,9 +101,9 @@ void moveOrrin(double x0, double y0, double r0,
 
   //  Front Left LEG
   // THIGH
-  HCPCA9685.Servo(FLThigh, altConvertThighAngleToServo(angles[0][0]));
+  HCPCA9685.Servo(FLThigh, altConvertThighAngleToServo(angles[0][0]) * FLThighOffset);
   // CALF
-  HCPCA9685.Servo(FLCalf, convertCalfAngleToServo(angles[0][1]));
+  HCPCA9685.Servo(FLCalf, 90);
   // HIP
   HCPCA9685.Servo(FLHip, angles[0][2]);
 
